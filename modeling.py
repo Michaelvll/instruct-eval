@@ -99,6 +99,8 @@ class SeqToSeqModel(EvalModel):
     def load(self):
         if self.model is None:
             args = {}
+            if self.load_float16:
+                args.update(low_cpu_mem_usage=True, torch_dtype=torch.float16)
             if self.load_8bit:
                 args.update(device_map="auto", load_in_8bit=True)
             self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_path, **args)
@@ -129,6 +131,8 @@ class CausalModel(SeqToSeqModel):
     def load(self):
         if self.model is None:
             args = {}
+            if self.load_float16:
+                args.update(low_cpu_mem_usage=True, torch_dtype=torch.float16)
             if self.load_8bit:
                 args.update(device_map="auto", load_in_8bit=True)
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -167,7 +171,7 @@ class LlamaModel(SeqToSeqModel):
         if self.model is None:
             args = {}
             if self.load_float16:
-                args.update(torch_dtype=torch.float16)
+                args.update(low_cpu_mem_usage=True, torch_dtype=torch.float16)
             if self.load_8bit:
                 args.update(device_map="auto", load_in_8bit=True)
             self.model = LlamaForCausalLM.from_pretrained(self.model_path, **args)
